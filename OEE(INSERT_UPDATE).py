@@ -147,9 +147,9 @@ def main():
                     print(failure_count)
                     A1.append(MTBF)
 
-                TOTAL_PIECES = 30  # min
-                IDEAL_RUNRATE = 20
-                REJECTED_PIECES = 5
+                TOTAL_PIECES = Z.registers[2]  # min
+                IDEAL_RUNRATE = Z.registers[3]
+                REJECTED_PIECES = Z.registers[4]
 
                 GOOD_PIECES = TOTAL_PIECES - REJECTED_PIECES
 
