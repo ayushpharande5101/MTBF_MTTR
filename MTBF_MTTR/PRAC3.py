@@ -43,13 +43,13 @@ def none_insert_data(cursor, values):
     cursor.execute(SQLCommand, values)
     connection.commit()  # Commit changes to the database
 
-
 values = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 none_insert_data(cursor, values)
 
 def restart_program():
     python = sys.executable
     os.execl(python, python, *sys.argv)
+
 def update_data(cursor, values):
     sql = """UPDATE MTBF_MTTR.dbo.DATA_UPDATE
              SET 
@@ -73,7 +73,6 @@ def update_data(cursor, values):
     cursor.execute(sql, values)
     connection.commit()  # Commit changes to the database
 
-
 def reset_variables():
     global failure_count, uptime_start_time, downtime_start_time, last_insert_time1
     failure_count = 0
@@ -92,6 +91,7 @@ def insert_data(cursor, values):
 
     cursor.execute(SQLCommand, values)
     connection.commit()  # Commit changes to the database
+
 def main():
     IP_Address1 = '127.0.0.1'
     client = ModbusTcpClient(IP_Address1)
@@ -192,7 +192,7 @@ def main():
 
         # Assuming Current_time_1 is a datetime object
         Current_time_1 = datetime.datetime.now()
-        target_time1 = Current_time_1.replace(hour=13, minute=9, second=0, microsecond=0)
+        target_time1 = Current_time_1.replace(hour=14, minute=20, second=0, microsecond=0)
 
         if Current_time_1 >= target_time1 and not data_inserted1:
             DATETIME = datetime.datetime.now()
@@ -302,7 +302,7 @@ def main():
 
                     # Assuming Current_time_1 is a datetime object
                 Current_time_2 = datetime.datetime.now()
-                target_time2 = Current_time_2.replace(hour=13, minute=10, second=0, microsecond=0)
+                target_time2 = Current_time_2.replace(hour=14, minute=21, second=0, microsecond=0)
 
                 if Current_time_2 >= target_time2 and not data_inserted2:
                     DATETIME = datetime.datetime.now()
@@ -410,7 +410,7 @@ def main():
 
                                 # Assuming Current_time_1 is a datetime object
                             Current_time_3 = datetime.datetime.now()
-                            target_time3 = Current_time_3.replace(hour=13, minute=11, second=0, microsecond=0)
+                            target_time3 = Current_time_3.replace(hour=14, minute=22, second=0, microsecond=0)
 
                             if Current_time_3 >= target_time3 and not data_inserted3:
                                 DATETIME = datetime.datetime.now()
@@ -423,10 +423,6 @@ def main():
                                 update_data(cursor, values)
 
                                 data_inserted3 = True
-                                if data_inserted3 == True:
-                                    time.sleep(60)
-                                    if __name__ == "__main__":
-                                        main()
 
         time.sleep(1)
 
