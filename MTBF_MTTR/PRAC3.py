@@ -4,7 +4,7 @@ import pyodbc
 import datetime
 import sys
 import os
-import schedule
+from pylogix import PLC
 # from datetime import datetime
 
 IP_Address1 = '127.0.0.1'
@@ -105,7 +105,7 @@ def main():
     last_insert_time1 = time.time()
 
 
-    Z = client.read_holding_registers(0, 10)
+    Z = client.read_holding_registers(0, 100)
     # if Z.registers[0] == 1:
     production_start_time = time.time()
     shift = 0
@@ -113,16 +113,17 @@ def main():
     n = 0
     iteration = 0
 
-    data_inserted = False
+    data_inserted1 = False
 
+    M = 0
     while True:
-        client.read_holding_registers(0, 10)
+        client.read_holding_registers(0, 100)
         end_time = time.time()
         production_time = end_time - production_start_time
         print(f"Production Time: {production_time}")
         A5.append(production_time)
 
-        Z = client.read_holding_registers(0, 10)
+        Z = client.read_holding_registers(0, 100)
         if Z.registers[0] == 1:
             client.write_registers(1,0)
             if uptime_start_time is None:
@@ -186,17 +187,14 @@ def main():
             QUALITY = GOOD_PIECES / TOTAL_PIECES
 
         OVERALL_OEE = (AVAILABILITY * PERFORMANCE * QUALITY) * 100
-        shift += 1
+
         iteration += 1
 
-        if shift>3:
-            shift = 1
-
-                # Assuming Current_time_1 is a datetime object
+        # Assuming Current_time_1 is a datetime object
         Current_time_1 = datetime.datetime.now()
-        target_time = Current_time_1.replace(hour=10, minute=44, second=0, microsecond=0)
+        target_time1 = Current_time_1.replace(hour=13, minute=9, second=0, microsecond=0)
 
-        if Current_time_1 >= target_time and not data_inserted:
+        if Current_time_1 >= target_time1 and not data_inserted1:
             DATETIME = datetime.datetime.now()
             values = (1, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
                         REJECTED_PIECES,
@@ -205,8 +203,8 @@ def main():
             insert_data(cursor, values)
             update_data(cursor, values)
 
-            data_inserted = True
-        if data_inserted == True:
+            data_inserted1 = True
+        if data_inserted1 == True:
             IP_Address1 = '127.0.0.1'
             client = ModbusTcpClient(IP_Address1)
             print(client.connect())
@@ -226,7 +224,7 @@ def main():
             n = 0
             iteration = 0
 
-            data_inserted1 = False
+            data_inserted2 = False
 
             while True:
                 client.read_holding_registers(0, 10)
@@ -299,17 +297,14 @@ def main():
                     QUALITY = GOOD_PIECES / TOTAL_PIECES
 
                 OVERALL_OEE = (AVAILABILITY * PERFORMANCE * QUALITY) * 100
-                shift += 1
+
                 iteration += 1
 
-                if shift > 3:
-                    shift = 1
-
                     # Assuming Current_time_1 is a datetime object
-                Current_time_1 = datetime.datetime.now()
-                target_time = Current_time_1.replace(hour=10, minute=45, second=0, microsecond=0)
+                Current_time_2 = datetime.datetime.now()
+                target_time2 = Current_time_2.replace(hour=13, minute=10, second=0, microsecond=0)
 
-                if Current_time_1 >= target_time and not data_inserted1:
+                if Current_time_2 >= target_time2 and not data_inserted2:
                     DATETIME = datetime.datetime.now()
                     values = (2, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
                               REJECTED_PIECES,
@@ -318,8 +313,8 @@ def main():
                     insert_data(cursor, values)
                     update_data(cursor, values)
 
-                    data_inserted1 = True
-                    if data_inserted1 == True:
+                    data_inserted2 = True
+                    if data_inserted2 == True:
                         IP_Address1 = '127.0.0.1'
                         client = ModbusTcpClient(IP_Address1)
                         print(client.connect())
@@ -339,7 +334,7 @@ def main():
                         n = 0
                         iteration = 0
 
-                        data_inserted2 = False
+                        data_inserted3 = False
 
                         while True:
                             client.read_holding_registers(0, 10)
@@ -412,17 +407,12 @@ def main():
                                 QUALITY = GOOD_PIECES / TOTAL_PIECES
 
                             OVERALL_OEE = (AVAILABILITY * PERFORMANCE * QUALITY) * 100
-                            shift += 1
-                            iteration += 1
-
-                            if shift > 3:
-                                shift = 1
 
                                 # Assuming Current_time_1 is a datetime object
-                            Current_time_1 = datetime.datetime.now()
-                            target_time = Current_time_1.replace(hour=10, minute=51, second=0, microsecond=0)
+                            Current_time_3 = datetime.datetime.now()
+                            target_time3 = Current_time_3.replace(hour=13, minute=11, second=0, microsecond=0)
 
-                            if Current_time_1 >= target_time and not data_inserted2:
+                            if Current_time_3 >= target_time3 and not data_inserted3:
                                 DATETIME = datetime.datetime.now()
                                 values = (
                                 3, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
@@ -432,12 +422,11 @@ def main():
                                 insert_data(cursor, values)
                                 update_data(cursor, values)
 
-                                data_inserted2 = True
-                                if data_inserted2 == True:
-                                    reset_variables()
-                                    continue
-
-
+                                data_inserted3 = True
+                                if data_inserted3 == True:
+                                    if __name__ == "__main__":
+                                        main()
+                                        
         time.sleep(1)
 
 if __name__ == "__main__":
