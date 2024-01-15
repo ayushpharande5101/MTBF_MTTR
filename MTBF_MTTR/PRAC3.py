@@ -424,9 +424,10 @@ def main():
 
                                 data_inserted3 = True
                                 if data_inserted3 == True:
+                                    time.sleep(60)
                                     if __name__ == "__main__":
                                         main()
-                                        
+
         time.sleep(1)
 
 if __name__ == "__main__":
