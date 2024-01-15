@@ -27,10 +27,10 @@ def import_data(cursor, values):
     table_name = 'MTBF_MTTR.dbo.[DATA_INSERT]'
 
     columns = ['DATETIME', 'MTBF', 'MTTR', 'TOTAL_FAILURES', 'TOTAL_UPTIME', 'TOTAL_DOWNTIME',
-               'TOTAL_PRODUCTION_TIME','TOTAL_PIECES','REJECTED_PIECES',
+               'TOTAL_PRODUCTION_TIME','TOTAL_PIECES','REJECTED_PIECES','GOOD_PIECES',
                'IDEAL_RUN_RATE','AVAILABILITY','PERFORMANCE','QUALITY','OVERALL_OEE']
 
-    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
     cursor.execute(SQLCommand, values)
     connection.commit()  # Commit changes to the database
@@ -110,9 +110,9 @@ def main():
                     print(failure_count)
                     A1.append(MTBF)
 
-                TOTAL_PIECES = 30  # min
-                IDEAL_RUNRATE = 20
-                REJECTED_PIECES = 5
+                TOTAL_PIECES = Z.registers[2]
+                IDEAL_RUNRATE = Z.registers[3]
+                REJECTED_PIECES = Z.registers[4]
 
                 GOOD_PIECES = TOTAL_PIECES - REJECTED_PIECES
 
@@ -125,9 +125,9 @@ def main():
                 print(OVERALL_OEE)
 
                 current_time = time.time()
-                if current_time - last_insert_time >= 600:  # Check if 10 minutes (600 seconds) have passed
+                if current_time - last_insert_time >= 10:  # Check if 10 minutes (600 seconds) have passed
                     DATETIME = datetime.datetime.now()
-                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,IDEAL_RUNRATE,
+                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,GOOD_PIECES,IDEAL_RUNRATE,
                               AVAILABILITY,PERFORMANCE,QUALITY,OVERALL_OEE)
                     import_data(cursor, values)
                     last_insert_time = current_time  # Update the last insertion time

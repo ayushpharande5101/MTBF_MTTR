@@ -35,6 +35,7 @@ def import_data(cursor, values):
                 TOTAL_PRODUCTION_TIME = ?,
                 TOTAL_PIECES = ?,
                 REJECTED_PIECES = ?,
+                GOOD_PIECES = ?,
                 IDEAL_RUN_RATE = ?,
                 AVAILABILITY = ?,
                 PERFORMANCE = ?,
@@ -135,7 +136,7 @@ def main():
                 current_time = time.time()
                 if current_time - last_insert_time >= 5:  # Check if 10 minutes (600 seconds) have passed
                     DATETIME = datetime.datetime.now()
-                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,IDEAL_RUNRATE,
+                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,GOOD_PIECES,IDEAL_RUNRATE,
                               AVAILABILITY,PERFORMANCE,QUALITY,OVERALL_OEE)
                     import_data(cursor, values)
                     last_insert_time = current_time  # Update the last insertion time

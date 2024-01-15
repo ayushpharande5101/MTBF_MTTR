@@ -28,17 +28,18 @@ def none_insert_data(cursor, values):
     table_name = 'MTBF_MTTR.dbo.[DATA_UPDATE]'
 
     columns = ['DATETIME', 'MTBF', 'MTTR', 'TOTAL_FAILURES', 'TOTAL_UPTIME', 'TOTAL_DOWNTIME',
-                   'TOTAL_PRODUCTION_TIME', 'TOTAL_PIECES', 'REJECTED_PIECES',
+                   'TOTAL_PRODUCTION_TIME', 'TOTAL_PIECES', 'REJECTED_PIECES','GOOD_PIECES',
                    'IDEAL_RUN_RATE', 'AVAILABILITY', 'PERFORMANCE', 'QUALITY', 'OVERALL_OEE']
 
-    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
     cursor.execute(SQLCommand, values)
     connection.commit()  # Commit changes to the database
 
 DATETIME = datetime.datetime.now()
-values = (DATETIME, 0, 0, 0, 0, 0, 0,0,0,0,0,0,0,0)
+values = (DATETIME, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 none_insert_data(cursor, values)
+
 def update_data(cursor, values):
     sql = """UPDATE MTBF_MTTR.dbo.DATA_UPDATE
              SET 
@@ -51,6 +52,7 @@ def update_data(cursor, values):
                 TOTAL_PRODUCTION_TIME = ?,
                 TOTAL_PIECES = ?,
                 REJECTED_PIECES = ?,
+                GOOD_PIECES = ?,
                 IDEAL_RUN_RATE = ?,
                 AVAILABILITY = ?,
                 PERFORMANCE = ?,
@@ -64,10 +66,10 @@ def insert_data(cursor, values):
     table_name = 'MTBF_MTTR.dbo.[DATA_INSERT]'
 
     columns = ['DATETIME', 'MTBF', 'MTTR', 'TOTAL_FAILURES', 'TOTAL_UPTIME', 'TOTAL_DOWNTIME',
-               'TOTAL_PRODUCTION_TIME','TOTAL_PIECES','REJECTED_PIECES',
+               'TOTAL_PRODUCTION_TIME','TOTAL_PIECES','REJECTED_PIECES','GOOD_PIECES',
                'IDEAL_RUN_RATE','AVAILABILITY','PERFORMANCE','QUALITY','OVERALL_OEE']
 
-    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
     cursor.execute(SQLCommand, values)
     connection.commit()  # Commit changes to the database
@@ -75,6 +77,22 @@ def insert_data(cursor, values):
 def read_modbus_data(client):
     Z = client.read_holding_registers(0, 5)
     return Z.registers[0] == 1, Z.registers[1]
+
+def insert_data1(cursor):
+    table_name = 'MTBF_MTTR.dbo.[DATA_INSERT]'
+    shift = 1
+
+    while shift <= 3:
+        if shift == 3:
+            shift = 1
+            time.sleep(1)
+    columns = ['SHIFT']
+
+    SQLCommand = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES (?)"
+
+    values = (shift)
+    cursor.execute(SQLCommand, values)
+    connection.commit()  # Commit changes to the database
 
 def main():
     IP_Address1 = '127.0.0.1'
@@ -86,11 +104,13 @@ def main():
     n = 1
     failure_count = 0  # Counter for failures
 
-      # Variable to store the last insertion time
+    # Variable to store the last insertion time
+
     while True:
         Z = client.read_holding_registers(0, 5)
         if Z.registers[0] == 1:
             last_insert_time = time.time()
+            shift = 1
             while True:
                 connection = pyodbc.connect('Driver={ODBC Driver 17 for SQL Server};'
                                             'Server= AYUSHP-DELL\\SQLEXPRESS03;'
@@ -159,17 +179,21 @@ def main():
 
                 OVERALL_OEE = (AVAILABILITY * PERFORMANCE * QUALITY) * 100
 
-                print(OVERALL_OEE)
+                if shift > 3:
+                    shift = 1
 
+                print(OVERALL_OEE)
                 current_time = time.time()
-                if current_time - last_insert_time >= 5:  # Check if 10 minutes (600 seconds) have passed
+                if current_time - last_insert_time >= 600:  # Check if 10 minutes (600 seconds) have passed
                     DATETIME = datetime.datetime.now()
-                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,IDEAL_RUNRATE,
+                    values = (DATETIME, A1[-1], A2[-1], A3[-1], A4[-1], A5[-1], A6[-1],TOTAL_PIECES,REJECTED_PIECES,GOOD_PIECES, IDEAL_RUNRATE,
                               AVAILABILITY,PERFORMANCE,QUALITY,OVERALL_OEE)
                     insert_data(cursor, values)
                     update_data(cursor, values)
+                    # insert_data1(cursor)
                     last_insert_time = current_time  # Update the last insertion time
                     if last_insert_time == current_time:
+
                         if __name__ == "__main__":
                             main()
 
