@@ -111,6 +111,7 @@ def main():
 
     M = 0
     while True:
+
         client.read_holding_registers(0, 100)
         end_time = time.time()
         production_time = end_time - production_start_time
@@ -184,7 +185,7 @@ def main():
 
         iteration += 1
 
-        if production_time>=10 and not data_inserted1:
+        if production_time>=30 and not data_inserted1:
             DATETIME = datetime.datetime.now()
             values = (1, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
                         REJECTED_PIECES,
@@ -285,7 +286,7 @@ def main():
 
                 iteration += 1
 
-                if production_time>=10 and not data_inserted2:
+                if production_time>=30 and not data_inserted2:
                     DATETIME = datetime.datetime.now()
                     values = (2, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
                               REJECTED_PIECES,
@@ -384,7 +385,7 @@ def main():
                             OVERALL_OEE = (AVAILABILITY * PERFORMANCE * QUALITY) * 100
 
 
-                            if production_time>=10 and not data_inserted3:
+                            if production_time>=30 and not data_inserted3:
                                 DATETIME = datetime.datetime.now()
                                 values = (
                                 3, DATETIME, A1[-1], A2[-1], failure_count, A3[-1], A4[-1], A5[-1], TOTAL_PIECES,
@@ -397,10 +398,11 @@ def main():
                                 data_inserted3 = True
                                 time.sleep(1)
                                 if __name__ == "__main__":
+                                    client.write_registers(1, 0)
                                     main()
 
         time.sleep(1)
 
 if __name__ == "__main__":
+    client.write_registers(1, 0)
     main()
-
